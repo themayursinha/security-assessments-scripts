@@ -1,1 +1,1 @@
-Collection of Python scripts.
+Collection of my Python scripts.
