@@ -2,10 +2,10 @@
 # Program for messing w/ threads and options
 
 import threading
-import Queue
+import queue
 import time
 import logging
-from optparse import OptionParser
+import argparse
 
 continue_threads = True
 
@@ -20,13 +20,13 @@ class WorkerThread(threading.Thread):
 	
 	
   def run(self):
-    print "In WorkerThread"
+    print("In WorkerThread")
     while continue_threads == True:
       counter = self.queue.get()
 	  # thread Logic goes here
-      print "Ordered to sleep for %d seconds!"%counter
+      print("Ordered to sleep for %d seconds!"%counter)
       time.sleep(counter)
-      print "Finished sleeping for %d seconds"%counter
+      print("Finished sleeping for %d seconds"%counter)
  
       self.queue.task_done()
   
@@ -35,45 +35,45 @@ class WorkerThread(threading.Thread):
 def main():
 
   # Setup the command line arguments.
-  optp = OptionParser()
+  parser = argparse.ArgumentParser(description='Thread management program')
 
   # Output verbosity options
-  optp.add_option('-q', '--quiet', help='set logging to ERROR',
+  parser.add_argument('-q', '--quiet', help='set logging to ERROR',
                   action='store_const', dest='loglevel',
                   const=logging.ERROR, default=logging.INFO)
-  optp.add_option('-d', '--debug', help='set logging to DEBUG',
+  parser.add_argument('-d', '--debug', help='set logging to DEBUG',
                   action='store_const', dest='loglevel',
                   const=logging.DEBUG, default=logging.INFO)
-  optp.add_option('-v', '--verbose', help='set logging to COMM',
+  parser.add_argument('-v', '--verbose', help='set logging to COMM',
                   action='store_const', dest='loglevel',
                   const=5, default=logging.INFO)
 
   # Option for number of threads
-  optp.add_option("-t", "--threads", dest="threads",
+  parser.add_argument("-t", "--threads", dest="threads",
                   help="The number of threads to spawn")
 				  
-  opts, args = optp.parse_args()
+  args = parser.parse_args()
 
-  if opts.threads is None:
-    opts.threads = raw_input("How threads do you want to spawn: ")
+  if args.threads is None:
+    args.threads = input("How threads do you want to spawn: ")
   
   # Setup logging.
-  logging.basicConfig(level=opts.loglevel,
+  logging.basicConfig(level=args.loglevel,
                       format='%(levelname)-8s %(message)s')
 
 
   # Main Event Loop:
   try:
-    queue = Queue.Queue()
+    queue = queue.Queue()
   
-    for i in range(int(opts.threads)):
-      print "Creating WorkerThread : %d"%i
+    for i in range(int(args.threads)):
+      print("Creating WorkerThread : %d"%i)
       worker = WorkerThread(queue)
       worker.setDaemon(True)
       worker.start()
-      print "WorkerThread %d Created!"%i
+      print("WorkerThread %d Created!"%i)
 
-    for j in range(int(opts.threads)):
+    for j in range(int(args.threads)):
       queue.put(j)
   
     queue.join()
@@ -82,7 +82,7 @@ def main():
     continue_threads = False
     exit(0)
 	
-  print "All tasks complete!"
+  print("All tasks complete!")
   
 if __name__ == '__main__':
   main()
