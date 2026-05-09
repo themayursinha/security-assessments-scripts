@@ -2,7 +2,7 @@
 # Inspired by: https://bitbucket.org/whyJoseph/spse-whyjoseph/src/a9cb102ae93826cd7155ff77c2c4a24f584ff0a3/SANSTopXIP.py
 from optparse import OptionParser
 import logging
-import urllib
+import urllib.request
 import re
 import sys
 # Uses BeautifulSoup4
@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 
 
 def threatIPs(quantity):
-  page = urllib.urlopen("http://isc.sans.edu/sources.html")
+  page = urllib.request.urlopen("http://isc.sans.edu/sources.html")
   parsed = BeautifulSoup(page.read(), "html.parser")
   counter = 0
   results = []
@@ -37,15 +37,15 @@ def main():
 
   optp.add_option("-n", "--quantity", dest="quantity",
                   help="The quantity of IP addresses to fetch from the threat feed")
-				  
+
   opts, args = optp.parse_args()
 
   if opts.quantity is None:
     opts.quantity = 100
-	
+
   results = threatIPs(opts.quantity)
   for result in results:
-    print result
+    print(result)
 
 
 if __name__ == '__main__':

@@ -10,34 +10,34 @@ tcpSocket = 0
 
 def signal_handler(signum, frm) :
   global tcpSocket
-  print "SIGINT received"
-  print "Shutting down client gracefully."
+  print("SIGINT received")
+  print("Shutting down client gracefully.")
   # now shut it down
   tcpSocket.close()
-  print "Exiting now."
+  print("Exiting now.")
   sys.exit()
 
 def tcp_client():
   global tcpSocket
-  
+
   tcpSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   tcpSocket.connect(TARGET_SERVER)
-  
+
   signal.signal(signal.SIGINT, signal_handler)
 
   while 1:
-    userInput = raw_input("Please enter a string: ")
-    tcpSocket.send(userInput)
-    print tcpSocket.recv(1024)
- 
+    userInput = input("Please enter a string: ")
+    tcpSocket.sendall(userInput.encode())
+    print(tcpSocket.recv(1024).decode(errors="replace"))
+
 
 if __name__ == '__main__':
-  print "Starting tcp client..."
+  print("Starting tcp client...")
   tcp_client()
 
   # SIGINT is the signal for program interupt
   signal.signal(signal.SIGINT, signal_handler)
- 
+
   # and now we wait
   while True:
     pass

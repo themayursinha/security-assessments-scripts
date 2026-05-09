@@ -7,7 +7,7 @@ def get_usb_messages():
   with open("/var/log/syslog") as f:
     for line in f:
       if "usb" in line.lower():
-        print line
-		
+        print(line)
+
 if __name__ == '__main__':
   get_usb_messages()

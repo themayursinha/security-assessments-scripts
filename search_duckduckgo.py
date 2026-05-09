@@ -1,20 +1,21 @@
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 from optparse import OptionParser
 import logging
-import urllib
+import urllib.request
+import urllib.parse
 import re
 
 
 # Search function takes any string query and returns a list of urls from DuckDuckGo
 def searchDDG(query):
-  site = urllib.urlopen('http://duckduckgo.com/html/?q={0}'.format(query))
+  site = urllib.request.urlopen('https://duckduckgo.com/html/?q={0}'.format(urllib.parse.quote_plus(query)))
   data = site.read()
-  parsed = BeautifulSoup(data)
+  parsed = BeautifulSoup(data, "html.parser")
   results = []
   for url in parsed.findAll('div', {'class': re.compile('url')}):
-    results.append(url.text)	
+    results.append(url.text)
   return results
-  
+
 # Main function with options for running script directly
 def main():
   # Setup the command line arguments.
@@ -34,15 +35,15 @@ def main():
   # Option for search query
   optp.add_option("-g", "--query", dest="query",
                   help="The search query to send to DuckDuckGo")
-				  
+
   opts, args = optp.parse_args()
   # Prompt if the user disn't give a search query
   if opts.query is None:
-    opts.query = raw_input("What is your search query for DuckDuckGo? ")
-	
+    opts.query = input("What is your search query for DuckDuckGo? ")
+
   results = searchDDG(opts.query)
   for result in results:
-    print result
+    print(result)
 
 
 if __name__ == '__main__':

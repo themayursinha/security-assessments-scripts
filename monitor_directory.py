@@ -9,7 +9,7 @@ def main():
   logging.basicConfig(level=logging.INFO,
                       format='%(asctime)s - %(message)s',
                       datefmt='%Y-%m-%d %H:%M:%S')
-  path = raw_input("What is the path of the directory (and all files recursively) you wish to monitor: ")
+  path = input("What is the path of the directory (and all files recursively) you wish to monitor: ")
   event_handler = LoggingEventHandler()
   observer = Observer()
   observer.schedule(event_handler, path, recursive=True)

@@ -1,21 +1,24 @@
 #/bin/python
 
-import SocketServer
-import SimpleHTTPServer
+import socketserver
+import http.server
 
 PORT = 8888
 
-class HTTPRequestHandler (SimpleHTTPServer.SimpleHTTPRequestHandler):
+class HTTPRequestHandler (http.server.SimpleHTTPRequestHandler):
 
   def do_GET(self):
     if self.path == '/test' :
-      self.wfile.write('You have found the test page!')
-      self.wfile.write(self.headers)
+      self.send_response(200)
+      self.send_header("Content-type", "text/plain")
+      self.end_headers()
+      self.wfile.write(b'You have found the test page!\n')
+      self.wfile.write(str(self.headers).encode())
     else:
-      SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
+      http.server.SimpleHTTPRequestHandler.do_GET(self)
 
 
 if __name__ == '__main__':
-  print "Starting server on port %d"%PORT
-  httpServer = SocketServer.TCPServer(("",PORT), HTTPRequestHandler)
+  print("Starting server on port %d"%PORT)
+  httpServer = socketserver.TCPServer(("",PORT), HTTPRequestHandler)
   httpServer.serve_forever()

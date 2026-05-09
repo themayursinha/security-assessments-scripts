@@ -16,4 +16,4 @@ for host in range(HOST_RANGE_START,HOST_RANGE_END):
   arpRequest = Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst=ip, hwdst="ff:ff:ff:ff:ff:ff")
   arpResponse = srp1(arpRequest, timeout=1, verbose=0)
   if arpResponse:
-    print "IP: " + arpResponse.psrc + " MAC: " + arpResponse.hwsrc
+    print("IP: " + arpResponse.psrc + " MAC: " + arpResponse.hwsrc)

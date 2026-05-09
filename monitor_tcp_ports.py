@@ -15,21 +15,21 @@ class monitor_TCP():
 
     # http://en.wikipedia.org/wiki/IPv4#Packet_structure
     # Internet Header Length; Have to determine where the IP header ends
-    ihl = ord(data[0]) & 15
+    ihl = data[0] & 15
     ip_payload = data[ihl*4:]
 
     # http://en.wikipedia.org/wiki/Transmission_Control_Protocol#TCP_segment_structure
     # Match SYN but not SYN/ACK
-    if (ord(ip_payload[13]) & 18) == 2:
+    if (ip_payload[13] & 18) == 2:
       src_addr = inet_ntoa(data[12:16])
       dst_addr = inet_ntoa(data[16:20])
       # Could use struct.unpack, might be clearer
-      src_port = (ord(ip_payload[0]) << 8) + ord(ip_payload[1])
-      dst_port = (ord(ip_payload[2]) << 8) + ord(ip_payload[3])
+      src_port = (ip_payload[0] << 8) + ip_payload[1]
+      dst_port = (ip_payload[2] << 8) + ip_payload[3]
       src_str = (src_addr+':'+str(src_port)).ljust(22)
       dst_str = (dst_addr+':'+str(dst_port))
       return "%s=> %s" % (src_str, dst_str)
-	  
+
 def main():
 
   # Setup the command line arguments.
@@ -54,7 +54,7 @@ def main():
                   help="The number of packets to capture (default is 0, aka infinite)")
   optp.add_option("-t", "--timeout", dest="timeout",
                   help="The number of minutes to listen before it times out (default is 0, aka infinite)")
-				  
+
   opts, args = optp.parse_args()
 
   if opts.listen is None:
@@ -63,7 +63,7 @@ def main():
     opts.number = "0"
   if opts.timeout is None:
     opts.timeout = "0"
-  
+
   # Setup logging.
   logging.basicConfig(level=opts.loglevel,
                       format='%(levelname)-8s %(message)s')
@@ -75,15 +75,15 @@ def main():
     max_number = 0  # max number of packets to capture counter
     monitor = monitor_TCP(opts)
     while True:
-      print monitor.listen_SYN()
+      print(monitor.listen_SYN())
       max_number = max_number + 1
       if (max_number == int(opts.number)) or ((int(opts.timeout) != 0) and (time.time() > timeout)):
         break
-	
+
   except (KeyboardInterrupt, EOFError) as e:
-    print "All done!"
+    print("All done!")
     exit(0)
-	
-  
+
+
 if __name__ == '__main__':
   main()

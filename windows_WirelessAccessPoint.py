@@ -1,22 +1,22 @@
 # Python wrapper for starting wireless access points on Windows
 import time
 import logging
-import os, sys
+import subprocess
 from optparse import OptionParser
 
 
 class AP():
   def __init__(self, opts):
-	self.SSID = opts.SSID
-	self.KEY = opts.KEY
+    self.SSID = opts.SSID
+    self.KEY = opts.KEY
 
   def start_AP(self):
-    os.popen("netsh wlan set hostednetwork mode=allow ssid={0} key={1}".format(self.SSID, self.KEY))
-    os.popen("netsh wlan start hostednetwork")
-	
+    subprocess.run(["netsh", "wlan", "set", "hostednetwork", "mode=allow", "ssid={0}".format(self.SSID), "key={0}".format(self.KEY)], check=True)
+    subprocess.run(["netsh", "wlan", "start", "hostednetwork"], check=True)
+
   def stop_AP(self):
-    os.popen("netsh wlan stop hostednetwork")
-	
+    subprocess.run(["netsh", "wlan", "stop", "hostednetwork"], check=False)
+
 
 def main():
 
@@ -40,14 +40,14 @@ def main():
   # Option for key to access point
   optp.add_option("-k", "--key", dest="KEY",
                   help="The key for the access point")
-				  
+
   opts, args = optp.parse_args()
 
   if opts.SSID is None:
-    opts.SSID = raw_input("SSID for the access point being broadcast: ")
+    opts.SSID = input("SSID for the access point being broadcast: ")
   if opts.KEY is None:
-    opts.KEY = raw_input("Key for the access point being broadcast (8-63 charcters): ")
-  
+    opts.KEY = input("Key for the access point being broadcast (8-63 charcters): ")
+
   # Setup logging.
   logging.basicConfig(level=opts.loglevel,
                       format='%(levelname)-8s %(message)s')
@@ -58,13 +58,13 @@ def main():
     ap = AP(opts)
     ap.start_AP()
     while True:
-	  time.sleep(1)
-	
+      time.sleep(1)
+
   except (KeyboardInterrupt, EOFError) as e:
     ap.stop_AP()
-    print "All done!"
+    print("All done!")
     exit(0)
-	
-  
+
+
 if __name__ == '__main__':
   main()

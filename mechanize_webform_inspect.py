@@ -1,10 +1,10 @@
 #/bin/python
 # A program for scraping pages and reading the web forms
-import mechanize 
+import mechanize
 import logging
 import time
 from optparse import OptionParser
-from urllib2 import HTTPError
+from urllib.error import HTTPError
 
 start = time.time()
 
@@ -17,13 +17,13 @@ def get_forms(target):
   br.open(target)
   forms = [f for f in br.forms()]
   for form in forms:
-    print "Form Name: {}".format(form.name)
-    print "Form Action: {}".format(form.action)
-    print "Form Method: {}".format(form.method)
+    print("Form Name: {}".format(form.name))
+    print("Form Action: {}".format(form.action))
+    print("Form Method: {}".format(form.method))
     for control in form.controls:
-      print "Field: {}".format(control)
-	  
-	  
+      print("Field: {}".format(control))
+
+
 def main():
   # Setup the command line arguments.
   optp = OptionParser()
@@ -42,12 +42,12 @@ def main():
   # Option for target web form to brute
   optp.add_option("-t", "--target", dest="target",
                   help="The target url to examine")
-				  
+
   opts, args = optp.parse_args()
 
   if opts.target is None:
-    opts.target = raw_input("What is the url of the page you want to examine: ")
-	
+    opts.target = input("What is the url of the page you want to examine: ")
+
   # Setup logging.
   logging.basicConfig(level=opts.loglevel,
                       format='%(levelname)-8s %(message)s')
@@ -56,12 +56,12 @@ def main():
   # Main Event Loop:
   try:
     get_forms(opts.target)
-  
+
   except (KeyboardInterrupt, EOFError) as e:
-    print "Exiting..."
+    print("Exiting...")
     exit(0)
 
-  print "Elapsed Time: %s" % (time.time() - start)
-  
+  print("Elapsed Time: %s" % (time.time() - start))
+
 if __name__ == '__main__':
   main()

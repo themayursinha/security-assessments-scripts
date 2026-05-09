@@ -11,16 +11,15 @@ class xor():
     result = bytearray((
       (data[i] ^ xor_var[i % l]) for i in range(0,len(data))
     ))
-    localFile = open(new_file, 'w')
-    localFile.write(result)
-    localFile.close()
+    with open(new_file, 'wb') as localFile:
+      localFile.write(result)
 
   def hexToByte(self, hexStr):
-    bytes = []
+    byte_values = []
     hexStr = ''.join( hexStr.split(" ") )
     for i in range(0, len(hexStr), 2):
-      bytes.append( chr( int (hexStr[i:i+2], 16 ) ) )
-    return bytes
+      byte_values.append(int(hexStr[i:i+2], 16))
+    return byte_values
 
 
 if __name__ == '__main__':
@@ -28,8 +27,8 @@ if __name__ == '__main__':
     transform = xor()
     orginal_file = sys.argv[1]
     new_file = sys.argv[2]
-    bytes = transform.hexToByte(sys.argv[3])
-    xor_var = bytearray(bytes)
+    byte_values = transform.hexToByte(sys.argv[3])
+    xor_var = bytearray(byte_values)
     transform.xor(orginal_file, new_file, xor_var)
   except IndexError:
     print('Usage: xor.py <input_file> <output_file> <"XOR hex bytes">')

@@ -14,25 +14,26 @@ class WorkerThread(threading.Thread):
   def __init__(self, queue):
     threading.Thread.__init__(self)
     self.queue = queue
-	
+
   def finish(self):
     self.cont = False
-	
-	
+
+
   def run(self):
     print("In WorkerThread")
     while continue_threads == True:
       counter = self.queue.get()
-	  # thread Logic goes here
+      # thread Logic goes here
       print("Ordered to sleep for %d seconds!"%counter)
       time.sleep(counter)
       print("Finished sleeping for %d seconds"%counter)
- 
+
       self.queue.task_done()
-  
+
 
 
 def main():
+  global continue_threads
 
   # Setup the command line arguments.
   parser = argparse.ArgumentParser(description='Thread management program')
@@ -51,12 +52,12 @@ def main():
   # Option for number of threads
   parser.add_argument("-t", "--threads", dest="threads",
                   help="The number of threads to spawn")
-				  
+
   args = parser.parse_args()
 
   if args.threads is None:
     args.threads = input("How threads do you want to spawn: ")
-  
+
   # Setup logging.
   logging.basicConfig(level=args.loglevel,
                       format='%(levelname)-8s %(message)s')
@@ -64,25 +65,25 @@ def main():
 
   # Main Event Loop:
   try:
-    queue = queue.Queue()
-  
+    work_queue = queue.Queue()
+
     for i in range(int(args.threads)):
       print("Creating WorkerThread : %d"%i)
-      worker = WorkerThread(queue)
-      worker.setDaemon(True)
+      worker = WorkerThread(work_queue)
+      worker.daemon = True
       worker.start()
       print("WorkerThread %d Created!"%i)
 
     for j in range(int(args.threads)):
-      queue.put(j)
-  
-    queue.join()
-  
+      work_queue.put(j)
+
+    work_queue.join()
+
   except (KeyboardInterrupt, EOFError) as e:
     continue_threads = False
     exit(0)
-	
+
   print("All tasks complete!")
-  
+
 if __name__ == '__main__':
   main()

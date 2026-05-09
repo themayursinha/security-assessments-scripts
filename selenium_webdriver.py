@@ -1,9 +1,9 @@
-#/bin/python
+#!/usr/bin/env python3
 # Program for messing with web driver
 from selenium import webdriver
 import logging
 from optparse import OptionParser
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 
 def screen_cap(site, output):
@@ -33,24 +33,24 @@ def main():
   # Option for site to browse to
   optp.add_option("-s", "--site", dest="site",
                   help="The site to browse to")
-				  
+
   # Option for name of the screenshot
   optp.add_option("-o", "--out", dest="output",
                   help="The name the screenshot saves to")
-				  
+
   opts, args = optp.parse_args()
 
   if opts.site is None:
-    opts.site = raw_input("which site do you want to browse to: ")
-	
+    opts.site = input("which site do you want to browse to: ")
+
   if opts.output is None:
     parsed = urlparse(opts.site)
-    domain = parsed.netloc
-    opts.output = str(domain)+".png"
-    print "Output file not specified, saving as: "+opts.output
+    domain = parsed.netloc or parsed.path.split("/")[0]
+    opts.output = f"{domain}.png"
+    print(f"Output file not specified, saving as: {opts.output}")
 
   # run main functions
   screen_cap(opts.site, opts.output)
-  
+
 if __name__ == '__main__':
   main()
