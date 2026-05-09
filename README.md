@@ -5,12 +5,85 @@ experimentation, web scraping, and Python language examples. These scripts were
 originally written as standalone learning utilities and have been modernized for
 Python 3.
 
+This repository is meant to help early-career engineers and security learners
+connect Python fundamentals with practical cybersecurity workflows. The scripts
+are intentionally small enough to read in one sitting, run from the command
+line, and modify while learning.
+
 ## Important Notice
 
 Use these tools only on systems and networks you own or are explicitly
 authorized to assess. Some scripts can generate network traffic, modify local
 firewall rules, spoof packets, or attempt form-based attacks. Run them in a lab
 environment first and review the source before using them.
+
+## How to Learn From This Repo
+
+The best way to use this repo is to read a script, run it against a safe target,
+then change one thing and observe the result. Avoid treating the scripts as
+black-box tools. The value is in understanding the code paths, inputs, outputs,
+and failure modes.
+
+Recommended workflow:
+
+1. Read the script top to bottom.
+2. Run `python3 script_name.py --help` when the script supports arguments.
+3. Run it against a local file, localhost service, or intentionally vulnerable
+   lab target.
+4. Add one small improvement, such as better error handling, a timeout, or CSV
+   output.
+5. Re-run `python3 -m compileall -q *.py` before committing changes.
+
+Good beginner-friendly scripts:
+
+| Start Here | What You Learn |
+| --- | --- |
+| `pythagoras.py` | Input handling, type conversion, basic math. |
+| `ez_base64.py` | Encoding, decoding, bytes versus strings. |
+| `basic_hash_tool.py` | File reading, hashing, command-line options. |
+| `file_entropy.py` | Loops, counters, math, binary files. |
+| `url_status_checker.py` | HTTP requests, error handling, simple parsing. |
+| `http_headers.py` | HTTP response headers and web security basics. |
+| `jwt_decode.py` | Structured data, JSON, Base64URL, token anatomy. |
+| `threads1.py` | Queues, worker threads, and concurrency basics. |
+
+Suggested learning path:
+
+1. Python basics: `pythagoras.py`, `user_exceptions.py`, `basic_hash_tool.py`.
+2. Files and logs: `dir_recurser.py`, `file_entropy.py`, `log_grep.py`.
+3. HTTP basics: `url_status_checker.py`, `http_headers.py`,
+   `robots_sitemap_fetcher.py`.
+4. Web security concepts: `cookie_flags_check.py`, `cors_check.py`,
+   `jwt_decode.py`, `json_endpoint_probe.py`.
+5. Networking basics: `dns_lookup.py`, `port_banner_grabber.py`,
+   `tcpClient_signals.py`, `tcpServer_SocketServer.py`.
+6. Advanced lab-only packet work: `arp_scan.py`, `synScan_threaded.py`,
+   `xmasScan_threaded.py`, `dns_spoof.py`, `arp_spoof.py`.
+
+## Safe Practice Targets
+
+Use local or intentionally vulnerable targets while learning. Good options
+include:
+
+- Local files for `basic_hash_tool.py`, `file_entropy.py`, `log_grep.py`, and
+  `xor_file.py`.
+- `http://127.0.0.1` services you start yourself.
+- OWASP Juice Shop, DVWA, WebGoat, or other intentionally vulnerable labs.
+- Public websites only for passive checks such as headers, TLS certificate
+  details, robots.txt, and URL status. Do not brute force, spoof, scan ports, or
+  probe wordlists against third-party systems without written authorization.
+
+## Concepts Covered
+
+This repo can help learners practice:
+
+- Python command-line interfaces with `argparse` and `optparse`.
+- Text, bytes, JSON, Base64, hashing, and binary file handling.
+- HTTP requests, response headers, cookies, redirects, and simple HTML parsing.
+- DNS, TCP sockets, raw sockets, packet capture, and packet crafting.
+- Threads, queues, signal handling, subprocess usage, and exception handling.
+- Security assessment habits: authorization, scope control, rate limiting,
+  repeatable evidence, and clear reporting.
 
 ## Requirements
 
