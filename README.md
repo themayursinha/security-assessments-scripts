@@ -42,9 +42,14 @@ Platform-specific notes:
 | `arp_scan.py` | Scans a local subnet with ARP requests using Scapy. |
 | `arp_spoof.py` | Demonstrates ARP spoofing and packet forwarding concepts. |
 | `dns_spoof.py` | Watches DNS requests and sends spoofed DNS responses. |
+| `dns_lookup.py` | Resolves A/AAAA records and reverse PTR lookups. |
 | `monitor_tcp_ports.py` | Monitors TCP SYN packets using raw sockets. |
 | `monitor_wifi_probes.py` | Prints Wi-Fi probe requests from monitor-mode traffic. |
+| `pcap_summary.py` | Summarizes packet counts and top endpoints from a pcap file. |
+| `port_banner_grabber.py` | Connects to TCP ports and captures simple service banners. |
 | `synScan_threaded.py` | Performs a threaded SYN scan with Scapy. |
+| `subdomain_wordlist_check.py` | Resolves candidate subdomains from a wordlist. |
+| `wifi_ssid_parser.py` | Extracts SSIDs and BSSIDs from saved Wi-Fi scan output. |
 | `xmasScan_threaded.py` | Performs a threaded XMAS scan with Scapy. |
 
 ### Web and Internet Utilities
@@ -61,6 +66,17 @@ Platform-specific notes:
 | `mechanize_webform_brute.py` | Demonstrates a form-based password-list workflow. |
 | `mechanize_webform_sqli.py` | Demonstrates submitting SQL injection payloads into form fields. |
 | `gatherThreatIntel_ISC_IPs.py` | Scrapes top source IPs from the SANS ISC sources page. |
+| `cors_check.py` | Checks CORS response headers for supplied origins. |
+| `cookie_flags_check.py` | Inspects `Set-Cookie` attributes for common security flags. |
+| `http_headers.py` | Summarizes common HTTP security headers and cookies. |
+| `json_endpoint_probe.py` | Fetches JSON endpoints and summarizes status, keys, and size. |
+| `jwt_decode.py` | Decodes JWT header and payload locally without verification. |
+| `lab_target_healthcheck.py` | Checks local lab web targets for reachability. |
+| `robots_sitemap_fetcher.py` | Fetches `robots.txt` and `sitemap.xml` paths. |
+| `tls_check.py` | Inspects certificate expiry and negotiated TLS details. |
+| `url_status_checker.py` | Checks URL status, redirects, titles, and server headers. |
+| `web_wordlist_probe.py` | Probes authorized web paths from a wordlist with rate limiting. |
+| `whois_rdaps_lookup.py` | Fetches RDAP registration data for domains or IPs. |
 
 ### TCP, FTP, and Server Examples
 
@@ -76,6 +92,9 @@ Platform-specific notes:
 | Script | Purpose |
 | --- | --- |
 | `dir_recurser.py` | Recursively lists directory contents and file sizes. |
+| `basic_hash_tool.py` | Calculates common hashes for files or strings. |
+| `file_entropy.py` | Calculates Shannon entropy for files. |
+| `log_grep.py` | Searches logs for IPs, URLs, emails, auth events, and errors. |
 | `monitor_directory.py` | Monitors filesystem events with watchdog. |
 | `monitor_process.py` | Prints process metadata and network connections with psutil. |
 | `pe_imports.py` | Prints imported DLLs and functions from a PE file. |
@@ -97,6 +116,7 @@ Platform-specific notes:
 | `pdb_example.py` | Small debugging example. |
 | `pythagoras.py` | Calculates a hypotenuse from two legs. |
 | `mysql_example.py` | Minimal MySQL usage example. |
+| `requirements_helper.py` | Reports third-party imports and a suggested install command. |
 
 ## Usage
 
@@ -110,6 +130,10 @@ python3 ez_base64.py encode "hello"
 python3 xor_file.py input.bin output.bin "de ad be ef"
 python3 selenium_webdriver.py --site https://example.com --out example.png
 python3 mechanize_webform_inspect.py --target https://example.com/login
+python3 http_headers.py https://example.com
+python3 tls_check.py example.com
+python3 jwt_decode.py eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjMifQ.signature
+python3 requirements_helper.py
 ```
 
 For scripts that send packets or bind raw sockets, run with appropriate
