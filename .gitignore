@@ -1,2 +1,15 @@
 __pycache__/
 *.py[cod]
+
+# secrets
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+service-account.json
+secrets/
+
+# local venvs
+.venv/
+venv/
