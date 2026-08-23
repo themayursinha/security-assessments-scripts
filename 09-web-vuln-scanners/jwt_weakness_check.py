@@ -90,9 +90,10 @@ def main():
     try:
       response = urllib.request.urlopen(request, timeout=10)
       status_none = getattr(response, "status", response.code)
-      body_none = response.read(4096)
+      body_none = response.read(4096).decode("utf-8", "replace")
     except urllib.error.HTTPError as exc:
-      status_none, body_none = exc.code, exc.read(4096)
+      status_none = exc.code
+      body_none = exc.read(4096).decode("utf-8", "replace")
 
     baseline_headers = dict(headers)
     baseline_headers["Authorization" if not args.cookie_name else "Cookie"] = (
@@ -105,11 +106,13 @@ def main():
     except urllib.error.HTTPError as exc:
       status_orig = exc.code
 
-    same = status_none == status_orig
-    flag = "[!]" if same else "[ ]"
+    auth_error_markers = ("401", "unauthorized", "invalid token", "signature", "unauthorized", "login")
+    looks_authed = status_none and 200 <= status_none < 300 and not any(
+        marker in body_none.lower() for marker in ("invalid", "signature", "unauthorized"))
+    flag = "[!]" if looks_authed else "[ ]"
     print(f"\n{flag} alg=none acceptance test: original token HTTP {status_orig}, forged none-token HTTP {status_none}")
-    if same:
-      findings.append("server accepted alg=none token!")
+    if looks_authed:
+      findings.append("server accepted alg=none token (2xx response with authenticated-looking content)!")
 
   print()
   if findings:

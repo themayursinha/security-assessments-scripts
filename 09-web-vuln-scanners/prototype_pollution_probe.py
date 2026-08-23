@@ -4,9 +4,11 @@
 import argparse
 import json
 import time
+import urllib.error
 import urllib.parse
+import urllib.request
 
-from sqli_detection_probe import fetch
+from sqli_detection_probe import UA, fetch
 
 QUERY_VARIANTS = [
   "__proto__[zxpolluted]=zxvalue",
@@ -57,17 +59,10 @@ def main():
     except json.JSONDecodeError as exc:
       raise SystemExit(f"--json-body is not valid JSON: {exc}")
 
-    def send(obj):
-      return fetch(args.url, data=json.dumps(obj), timeout=10)
-
-    from sqli_detection_probe import UA
-    import urllib.request
-
     def post_json(obj):
       request = urllib.request.Request(
         args.url, data=json.dumps(obj).encode(),
         headers={"User-Agent": UA, "Content-Type": "application/json"})
-      import urllib.error
       try:
         response = urllib.request.urlopen(request, timeout=10)
         return getattr(response, "status", response.code), response.read(65536).decode("utf-8", "replace")
