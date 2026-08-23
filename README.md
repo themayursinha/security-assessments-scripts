@@ -69,9 +69,17 @@ include:
   `xor_file.py`.
 - `http://127.0.0.1` services you start yourself.
 - OWASP Juice Shop, DVWA, WebGoat, or other intentionally vulnerable labs.
+- The vulnerability-probe scripts are best practiced against those same local
+  lab targets: `open_redirect_probe.py`, `path_traversal_probe.py`,
+  `ssrf_probe.py`, and `hostheader_injection_probe.py` all accept any URL, so
+  point them at your own instance of a vulnerable app.
 - Public websites only for passive checks such as headers, TLS certificate
   details, robots.txt, and URL status. Do not brute force, spoof, scan ports, or
   probe wordlists against third-party systems without written authorization.
+- Fully passive recon tools such as `cve_lookup.py`, `security_txt_checker.py`,
+  `typosquat_domain_check.py` (without `--resolve`), and the report converters
+  (`nmap_xml_parser.py`, `email_header_analyzer.py`, `secrets_scanner.py`) are
+  safe to run anywhere on data you already have.
 
 ## Concepts Covered
 
@@ -125,6 +133,22 @@ Platform-specific notes:
 | `wifi_ssid_parser.py` | Extracts SSIDs and BSSIDs from saved Wi-Fi scan output. |
 | `xmasScan_threaded.py` | Performs a threaded XMAS scan with Scapy. |
 
+### Vulnerability Probes (Authorized Targets Only)
+
+Run these only against lab instances or systems you have written permission to
+test. They send crafted requests and are designed to teach the underlying
+vulnerability class, not to be point-and-click scanners.
+
+| Script | Purpose |
+| --- | --- |
+| `dns_zone_transfer.py` | Resolves nameservers and attempts AXFR zone transfers using a minimal raw DNS client. |
+| `hostheader_injection_probe.py` | Tests Host/X-Forwarded-* handling for reflections that enable reset poisoning or cache confusion. |
+| `http_request_smuggling_probe.py` | Sends CL.TE and TE.CL differential probes over raw sockets to spot desync candidates. |
+| `open_redirect_probe.py` | Injects redirect payloads into parameters, follows Location chains manually, and flags off-site hops; can crawl links first. |
+| `path_traversal_probe.py` | Fuzzes file parameters with traversal and encoding variants and matches OS file signatures. |
+| `ssrf_probe.py` | Probes URL-fetch parameters with loopback, metadata, and scheme payloads plus timing analysis. |
+| `subdomain_takeover_check.py` | Flags dangling DNS records and fingerprints known takeover-vulnerable services via CNAME hints and body markers. |
+
 ### Web and Internet Utilities
 
 | Script | Purpose |
@@ -150,6 +174,9 @@ Platform-specific notes:
 | `url_status_checker.py` | Checks URL status, redirects, titles, and server headers. |
 | `web_wordlist_probe.py` | Probes authorized web paths from a wordlist with rate limiting. |
 | `whois_rdaps_lookup.py` | Fetches RDAP registration data for domains or IPs. |
+| `cve_lookup.py` | Queries the public NVD API 2.0 by CVE ID or keyword and prints severity summaries. |
+| `security_txt_checker.py` | Discovers security.txt and validates it against RFC 9116 requirements. |
+| `typosquat_domain_check.py` | Generates typo, homoglyph, and neighbor-key domain permutations with optional resolution for brand monitoring. |
 
 ### TCP, FTP, and Server Examples
 
@@ -170,6 +197,9 @@ Platform-specific notes:
 | `log_grep.py` | Searches logs for IPs, URLs, emails, auth events, and errors. |
 | `monitor_directory.py` | Monitors filesystem events with watchdog. |
 | `monitor_process.py` | Prints process metadata and network connections with psutil. |
+| `email_header_analyzer.py` | Triages an .eml file: Received chain, SPF/DKIM/DMARC verdicts, attachment risk, and spoofing hints. |
+| `nmap_xml_parser.py` | Converts nmap `-oX` XML output into a table, CSV, or Markdown report for findings write-ups. |
+| `secrets_scanner.py` | Scans files and directories for credential-like patterns with redacted output; exits non-zero when matches are found. |
 | `pe_imports.py` | Prints imported DLLs and functions from a PE file. |
 | `usb_logs.py` | Prints USB-related lines from `/var/log/syslog`. |
 | `xor_file.py` | XORs an input file with supplied hex bytes and writes the result. |
@@ -207,6 +237,25 @@ python3 http_headers.py https://example.com
 python3 tls_check.py example.com
 python3 jwt_decode.py eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjMifQ.signature
 python3 requirements_helper.py
+
+python3 cve_lookup.py --id CVE-2024-21762
+python3 security_txt_checker.py github.com
+python3 typosquat_domain_check.py mycompany.com --resolve
+python3 secrets_scanner.py ./my-project --strict
+python3 email_header_analyzer.py suspicious.eml
+python3 nmap_xml_parser.py scan.xml --open-only --csv report.csv
+```
+
+The probe scripts require explicit authorization for the target:
+
+```bash
+python3 subdomain_takeover_check.py @subdomains.txt
+python3 dns_zone_transfer.py lab.example
+python3 open_redirect_probe.py "https://lab.example/redirect?next=/" --crawl
+python3 hostheader_injection_probe.py https://lab.example/reset
+python3 ssrf_probe.py "https://lab.example/fetch?url=x" --param url
+python3 path_traversal_probe.py "https://lab.example/download?f=a.pdf" --param f
+sudo python3 http_request_smuggling_probe.py 127.0.0.1:8080 --technique clte
 ```
 
 For scripts that send packets or bind raw sockets, run with appropriate
