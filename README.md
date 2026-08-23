@@ -32,6 +32,7 @@ host-side analysis, with fundamentals at the end.
 06-encoding-utils/        Base64, XOR, hashing helpers
 07-server-examples/       Minimal TCP/HTTP servers and clients
 08-python-fundamentals/   Threads, signals, exceptions, debugging basics
+09-web-vuln-scanners/     One detector per Academy vulnerability class
 ```
 
 Each directory has its own `README.md` listing every script in that category,
@@ -47,6 +48,7 @@ what it does, and what is safe to run where.
 | [`06-encoding-utils`](06-encoding-utils) | 3 | Transform data during exploitation or analysis work. |
 | [`07-server-examples`](07-server-examples) | 6 | Run throwaway listeners or study socket programming. |
 | [`08-python-fundamentals`](08-python-fundamentals) | 9 | Learn the Python building blocks used everywhere else. |
+| [`09-web-vuln-scanners`](09-web-vuln-scanners) | 23 | Run class-by-class detectors mapped to PortSwigger Academy topics. |
 
 Repo tooling: `requirements_helper.py` (repo root) scans all category
 directories and reports the third-party imports each script needs.
@@ -80,9 +82,10 @@ Suggested learning path across categories:
    `cookie_flags_check.py`, `jwt_decode.py`, `cors_check.py`.
 5. **Networking basics** (`03-network-scanning`, `07-server-examples`):
    `port_banner_grabber.py`, `pcap_summary.py`, `tcpServer_SocketServer.py`.
-6. **Active testing, lab only** (`02-web-assessment` probes,
-   `04-spoofing-lab`): `open_redirect_probe.py`, `ssrf_probe.py`,
-   `arp_spoof.py`.
+6. **Active testing, lab only** (`02-web-assessment` probes, `04-spoofing-lab`,
+   `09-web-vuln-scanners`): `open_redirect_probe.py`, `ssrf_probe.py`,
+   `arp_spoof.py`, then class detectors such as `sqli_detection_probe.py`,
+   `ssti_probe.py`, and `cache_poisoning_probe.py`.
 
 ## Safe Practice Targets
 
@@ -93,10 +96,10 @@ include:
   `xor_file.py`.
 - `http://127.0.0.1` services you start yourself.
 - OWASP Juice Shop, DVWA, WebGoat, or other intentionally vulnerable labs.
-- The vulnerability-probe scripts are best practiced against those same local
-  lab targets: `open_redirect_probe.py`, `path_traversal_probe.py`,
-  `ssrf_probe.py`, and `hostheader_injection_probe.py` all accept any URL, so
-  point them at your own instance of a vulnerable app.
+- The vulnerability-probe and scanner scripts are best practiced against those
+  same local lab targets: everything in `02-web-assessment` probes plus every
+  script in `09-web-vuln-scanners` accepts a URL, so point them at your own
+  instance of a vulnerable app.
 - Public websites only for passive checks such as headers, TLS certificate
   details, robots.txt, and URL status. Do not brute force, spoof, scan ports, or
   probe wordlists against third-party systems without written authorization.
@@ -152,6 +155,9 @@ python3 03-network-scanning/nmap_xml_parser.py scan.xml --open-only --csv report
 python3 05-host-forensics/secrets_scanner.py ./my-project --strict
 python3 05-host-forensics/email_header_analyzer.py suspicious.eml
 python3 06-encoding-utils/xor_file.py input.bin output.bin "de ad be ef"
+python3 09-web-vuln-scanners/ssti_probe.py "https://lab.example/page?tpl=x" --param tpl
+python3 09-web-vuln-scanners/graphql_probe.py https://lab.example
+python3 09-web-vuln-scanners/jwt_weakness_check.py "$TOKEN" --wordlist rockyou.txt
 ```
 
 For scripts that send packets or bind raw sockets, run with appropriate

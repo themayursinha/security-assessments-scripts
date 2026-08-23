@@ -33,3 +33,9 @@ authorization.
 | `path_traversal_probe.py` | Fuzz file parameters with traversal payloads. |
 | `ssrf_probe.py` | Probe URL-fetch parameters for SSRF indicators. |
 | `web_wordlist_probe.py` | Probe authorized web paths from a wordlist with rate limiting. |
+
+## Method checks
+
+| Script | Purpose |
+| --- | --- |
+| `http_methods_check.py` | Enumerate allowed methods; flag TRACE reflection and write-method exposure. |
