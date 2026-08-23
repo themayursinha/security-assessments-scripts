@@ -46,14 +46,17 @@ def main():
   args = parser.parse_args()
 
   root = Path(args.path)
-  scripts = sorted(root.glob("*.py"))
+  scripts = sorted(
+    path for path in root.rglob("*.py")
+    if not any(part.startswith(".") or part == "__pycache__" for part in path.relative_to(root).parts)
+  )
   script_names = {path.stem for path in scripts}
   third_party = {}
 
   for script in scripts:
     for name in imports_for(script):
       if name in PACKAGE_HINTS or not is_stdlib_or_local(name, script_names):
-        third_party.setdefault(name, set()).add(script.name)
+        third_party.setdefault(name, set()).add(str(script.relative_to(root)))
 
   if not third_party:
     print("No third-party imports detected.")

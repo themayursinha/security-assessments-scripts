@@ -17,6 +17,40 @@ authorized to assess. Some scripts can generate network traffic, modify local
 firewall rules, spoof packets, or attempt form-based attacks. Run them in a lab
 environment first and review the source before using them.
 
+## Repository Layout
+
+Scripts are grouped into numbered categories that follow the rough order of an
+assessment engagement: passive research, then web and network testing, then
+host-side analysis, with fundamentals at the end.
+
+```
+01-recon-osint/           Passive intel: DNS, subdomains, WHOIS, CVEs, search
+02-web-assessment/        HTTP/TLS checks + active vulnerability probes
+03-network-scanning/      Port scans, banners, pcaps, wireless monitoring
+04-spoofing-lab/          ARP/DNS spoofing demonstrations (isolated labs only)
+05-host-forensics/        Logs, entropy, secrets, PE/email triage
+06-encoding-utils/        Base64, XOR, hashing helpers
+07-server-examples/       Minimal TCP/HTTP servers and clients
+08-python-fundamentals/   Threads, signals, exceptions, debugging basics
+```
+
+Each directory has its own `README.md` listing every script in that category,
+what it does, and what is safe to run where.
+
+| Category | Scripts | Use it when you want to... |
+| --- | --- | --- |
+| [`01-recon-osint`](01-recon-osint) | 13 | Map DNS, subdomains, registrations, CVEs, and search footprint passively. |
+| [`02-web-assessment`](02-web-assessment) | 18 | Inspect headers/cookies/TLS/JWTs, then probe authorized web apps. |
+| [`03-network-scanning`](03-network-scanning) | 10 | Scan ports, grab banners, parse nmap output, watch traffic. |
+| [`04-spoofing-lab`](04-spoofing-lab) | 2 | Study ARP/DNS man-in-the-middle mechanics in an isolated lab. |
+| [`05-host-forensics`](05-host-forensics) | 9 | Triage logs, hunt secrets, analyze suspicious emails and binaries. |
+| [`06-encoding-utils`](06-encoding-utils) | 3 | Transform data during exploitation or analysis work. |
+| [`07-server-examples`](07-server-examples) | 6 | Run throwaway listeners or study socket programming. |
+| [`08-python-fundamentals`](08-python-fundamentals) | 9 | Learn the Python building blocks used everywhere else. |
+
+Repo tooling: `requirements_helper.py` (repo root) scans all category
+directories and reports the third-party imports each script needs.
+
 ## How to Learn From This Repo
 
 The best way to use this repo is to read a script, run it against a safe target,
@@ -32,33 +66,23 @@ Recommended workflow:
    lab target.
 4. Add one small improvement, such as better error handling, a timeout, or CSV
    output.
-5. Re-run `python3 -m compileall -q *.py` before committing changes.
+5. Re-run `python3 -m compileall -q .` before committing changes.
 
-Good beginner-friendly scripts:
+Suggested learning path across categories:
 
-| Start Here | What You Learn |
-| --- | --- |
-| `pythagoras.py` | Input handling, type conversion, basic math. |
-| `ez_base64.py` | Encoding, decoding, bytes versus strings. |
-| `basic_hash_tool.py` | File reading, hashing, command-line options. |
-| `file_entropy.py` | Loops, counters, math, binary files. |
-| `url_status_checker.py` | HTTP requests, error handling, simple parsing. |
-| `http_headers.py` | HTTP response headers and web security basics. |
-| `jwt_decode.py` | Structured data, JSON, Base64URL, token anatomy. |
-| `threads1.py` | Queues, worker threads, and concurrency basics. |
-
-Suggested learning path:
-
-1. Python basics: `pythagoras.py`, `user_exceptions.py`, `basic_hash_tool.py`.
-2. Files and logs: `dir_recurser.py`, `file_entropy.py`, `log_grep.py`.
-3. HTTP basics: `url_status_checker.py`, `http_headers.py`,
-   `robots_sitemap_fetcher.py`.
-4. Web security concepts: `cookie_flags_check.py`, `cors_check.py`,
-   `jwt_decode.py`, `json_endpoint_probe.py`.
-5. Networking basics: `dns_lookup.py`, `port_banner_grabber.py`,
-   `tcpClient_signals.py`, `tcpServer_SocketServer.py`.
-6. Advanced lab-only packet work: `arp_scan.py`, `synScan_threaded.py`,
-   `xmasScan_threaded.py`, `dns_spoof.py`, `arp_spoof.py`.
+1. **Python basics** (`08-python-fundamentals`): `pythagoras.py`,
+   `user_exceptions.py`, `threads1.py`.
+2. **Files, logs, and encodings** (`05-host-forensics`, `06-encoding-utils`):
+   `dir_recurser.py`, `file_entropy.py`, `log_grep.py`, `xor_file.py`.
+3. **Passive recon** (`01-recon-osint`): `dns_lookup.py`,
+   `whois_rdaps_lookup.py`, `cve_lookup.py`, `subdomain_wordlist_check.py`.
+4. **Web security concepts** (`02-web-assessment`): `http_headers.py`,
+   `cookie_flags_check.py`, `jwt_decode.py`, `cors_check.py`.
+5. **Networking basics** (`03-network-scanning`, `07-server-examples`):
+   `port_banner_grabber.py`, `pcap_summary.py`, `tcpServer_SocketServer.py`.
+6. **Active testing, lab only** (`02-web-assessment` probes,
+   `04-spoofing-lab`): `open_redirect_probe.py`, `ssrf_probe.py`,
+   `arp_spoof.py`.
 
 ## Safe Practice Targets
 
@@ -76,7 +100,7 @@ include:
 - Public websites only for passive checks such as headers, TLS certificate
   details, robots.txt, and URL status. Do not brute force, spoof, scan ports, or
   probe wordlists against third-party systems without written authorization.
-- Fully passive recon tools such as `cve_lookup.py`, `security_txt_checker.py`,
+- Fully passive tools such as `cve_lookup.py`, `security_txt_checker.py`,
   `typosquat_domain_check.py` (without `--resolve`), and the report converters
   (`nmap_xml_parser.py`, `email_header_analyzer.py`, `secrets_scanner.py`) are
   safe to run anywhere on data you already have.
@@ -99,7 +123,8 @@ This repo can help learners practice:
 - Some scripts require elevated privileges, especially raw socket and Scapy
   packet-crafting tools.
 - Several scripts depend on third-party packages that are not vendored in this
-  repository.
+  repository; run `python3 requirements_helper.py` to regenerate the
+  authoritative import map.
 
 Common optional dependencies:
 
@@ -114,164 +139,36 @@ Platform-specific notes:
   appropriate network interface configuration.
 - Selenium usage requires a browser and matching WebDriver support.
 
-## Script Inventory
-
-### Network and Packet Tools
-
-| Script | Purpose |
-| --- | --- |
-| `arp_scan.py` | Scans a local subnet with ARP requests using Scapy. |
-| `arp_spoof.py` | Demonstrates ARP spoofing and packet forwarding concepts. |
-| `dns_spoof.py` | Watches DNS requests and sends spoofed DNS responses. |
-| `dns_lookup.py` | Resolves A/AAAA records and reverse PTR lookups. |
-| `monitor_tcp_ports.py` | Monitors TCP SYN packets using raw sockets. |
-| `monitor_wifi_probes.py` | Prints Wi-Fi probe requests from monitor-mode traffic. |
-| `pcap_summary.py` | Summarizes packet counts and top endpoints from a pcap file. |
-| `port_banner_grabber.py` | Connects to TCP ports and captures simple service banners. |
-| `synScan_threaded.py` | Performs a threaded SYN scan with Scapy. |
-| `subdomain_wordlist_check.py` | Resolves candidate subdomains from a wordlist. |
-| `wifi_ssid_parser.py` | Extracts SSIDs and BSSIDs from saved Wi-Fi scan output. |
-| `xmasScan_threaded.py` | Performs a threaded XMAS scan with Scapy. |
-
-### Vulnerability Probes (Authorized Targets Only)
-
-Run these only against lab instances or systems you have written permission to
-test. They send crafted requests and are designed to teach the underlying
-vulnerability class, not to be point-and-click scanners.
-
-| Script | Purpose |
-| --- | --- |
-| `dns_zone_transfer.py` | Resolves nameservers and attempts AXFR zone transfers using a minimal raw DNS client. |
-| `hostheader_injection_probe.py` | Tests Host/X-Forwarded-* handling for reflections that enable reset poisoning or cache confusion. |
-| `http_request_smuggling_probe.py` | Sends CL.TE and TE.CL differential probes over raw sockets to spot desync candidates. |
-| `open_redirect_probe.py` | Injects redirect payloads into parameters, follows Location chains manually, and flags off-site hops; can crawl links first. |
-| `path_traversal_probe.py` | Fuzzes file parameters with traversal and encoding variants and matches OS file signatures. |
-| `ssrf_probe.py` | Probes URL-fetch parameters with loopback, metadata, and scheme payloads plus timing analysis. |
-| `subdomain_takeover_check.py` | Flags dangling DNS records and fingerprints known takeover-vulnerable services via CNAME hints and body markers. |
-
-### Web and Internet Utilities
-
-| Script | Purpose |
-| --- | --- |
-| `BaseHTTPServer1.py` | Minimal custom HTTP server example. |
-| `SimpleHTTPServer1.py` | Simple static HTTP server with a custom `/test` route. |
-| `selenium_webdriver.py` | Captures a screenshot of a target site with Selenium. |
-| `search_duckduckgo.py` | Queries DuckDuckGo HTML search and extracts result URLs. |
-| `search_scrape_parse_threaded.py` | Searches, fetches, and parses web pages with worker threads. |
-| `mechanize_scraper_threaded.py` | Fetches a path from a list of domains using threaded mechanize workers. |
-| `mechanize_webform_inspect.py` | Lists web forms and form controls on a target page. |
-| `mechanize_webform_brute.py` | Demonstrates a form-based password-list workflow. |
-| `mechanize_webform_sqli.py` | Demonstrates submitting SQL injection payloads into form fields. |
-| `gatherThreatIntel_ISC_IPs.py` | Scrapes top source IPs from the SANS ISC sources page. |
-| `cors_check.py` | Checks CORS response headers for supplied origins. |
-| `cookie_flags_check.py` | Inspects `Set-Cookie` attributes for common security flags. |
-| `http_headers.py` | Summarizes common HTTP security headers and cookies. |
-| `json_endpoint_probe.py` | Fetches JSON endpoints and summarizes status, keys, and size. |
-| `jwt_decode.py` | Decodes JWT header and payload locally without verification. |
-| `lab_target_healthcheck.py` | Checks local lab web targets for reachability. |
-| `robots_sitemap_fetcher.py` | Fetches `robots.txt` and `sitemap.xml` paths. |
-| `tls_check.py` | Inspects certificate expiry and negotiated TLS details. |
-| `url_status_checker.py` | Checks URL status, redirects, titles, and server headers. |
-| `web_wordlist_probe.py` | Probes authorized web paths from a wordlist with rate limiting. |
-| `whois_rdaps_lookup.py` | Fetches RDAP registration data for domains or IPs. |
-| `cve_lookup.py` | Queries the public NVD API 2.0 by CVE ID or keyword and prints severity summaries. |
-| `security_txt_checker.py` | Discovers security.txt and validates it against RFC 9116 requirements. |
-| `typosquat_domain_check.py` | Generates typo, homoglyph, and neighbor-key domain permutations with optional resolution for brand monitoring. |
-
-### TCP, FTP, and Server Examples
-
-| Script | Purpose |
-| --- | --- |
-| `tcpClient_signals.py` | Basic TCP client with SIGINT cleanup. |
-| `tcpServer_SocketServer.py` | Basic TCP echo server using `socketserver`. |
-| `tcpServer_signals.py` | TCP listener example with signal handling. |
-| `ftp_explorer.py` | Connects to FTP servers from a list and prints directory entries. |
-
-### Host and File Utilities
-
-| Script | Purpose |
-| --- | --- |
-| `dir_recurser.py` | Recursively lists directory contents and file sizes. |
-| `basic_hash_tool.py` | Calculates common hashes for files or strings. |
-| `file_entropy.py` | Calculates Shannon entropy for files. |
-| `log_grep.py` | Searches logs for IPs, URLs, emails, auth events, and errors. |
-| `monitor_directory.py` | Monitors filesystem events with watchdog. |
-| `monitor_process.py` | Prints process metadata and network connections with psutil. |
-| `email_header_analyzer.py` | Triages an .eml file: Received chain, SPF/DKIM/DMARC verdicts, attachment risk, and spoofing hints. |
-| `nmap_xml_parser.py` | Converts nmap `-oX` XML output into a table, CSV, or Markdown report for findings write-ups. |
-| `secrets_scanner.py` | Scans files and directories for credential-like patterns with redacted output; exits non-zero when matches are found. |
-| `pe_imports.py` | Prints imported DLLs and functions from a PE file. |
-| `usb_logs.py` | Prints USB-related lines from `/var/log/syslog`. |
-| `xor_file.py` | XORs an input file with supplied hex bytes and writes the result. |
-| `ez_base64.py` | Encodes or decodes a value with Base64. |
-| `windows_WirelessAccessPoint.py` | Starts and stops a Windows hosted wireless network. |
-
-### Python Examples
-
-| Script | Purpose |
-| --- | --- |
-| `forker.py` | Demonstrates process forking. |
-| `lock_threads.py` | Demonstrates thread locking around a shared counter. |
-| `threads1.py` | Basic worker-thread queue example. |
-| `threads2.py` | Thread queue example with command-line options. |
-| `signals.py` | Demonstrates custom signal handling. |
-| `user_exceptions.py` | Demonstrates custom exception classes. |
-| `pdb_example.py` | Small debugging example. |
-| `pythagoras.py` | Calculates a hypotenuse from two legs. |
-| `mysql_example.py` | Minimal MySQL usage example. |
-| `requirements_helper.py` | Reports third-party imports and a suggested install command. |
-
 ## Usage
 
-Each script is intended to be run directly. Most scripts either take command-line
-options or prompt interactively when required values are missing.
-
-Examples:
+Scripts run directly from their category directories:
 
 ```bash
-python3 ez_base64.py encode "hello"
-python3 xor_file.py input.bin output.bin "de ad be ef"
-python3 selenium_webdriver.py --site https://example.com --out example.png
-python3 mechanize_webform_inspect.py --target https://example.com/login
-python3 http_headers.py https://example.com
-python3 tls_check.py example.com
-python3 jwt_decode.py eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjMifQ.signature
-python3 requirements_helper.py
-
-python3 cve_lookup.py --id CVE-2024-21762
-python3 security_txt_checker.py github.com
-python3 typosquat_domain_check.py mycompany.com --resolve
-python3 secrets_scanner.py ./my-project --strict
-python3 email_header_analyzer.py suspicious.eml
-python3 nmap_xml_parser.py scan.xml --open-only --csv report.csv
-```
-
-The probe scripts require explicit authorization for the target:
-
-```bash
-python3 subdomain_takeover_check.py @subdomains.txt
-python3 dns_zone_transfer.py lab.example
-python3 open_redirect_probe.py "https://lab.example/redirect?next=/" --crawl
-python3 hostheader_injection_probe.py https://lab.example/reset
-python3 ssrf_probe.py "https://lab.example/fetch?url=x" --param url
-python3 path_traversal_probe.py "https://lab.example/download?f=a.pdf" --param f
-sudo python3 http_request_smuggling_probe.py 127.0.0.1:8080 --technique clte
+python3 01-recon-osint/cve_lookup.py --id CVE-2024-21762
+python3 01-recon-osint/security_txt_checker.py github.com
+python3 02-web-assessment/http_headers.py https://example.com
+python3 02-web-assessment/tls_check.py example.com
+python3 03-network-scanning/nmap_xml_parser.py scan.xml --open-only --csv report.csv
+python3 05-host-forensics/secrets_scanner.py ./my-project --strict
+python3 05-host-forensics/email_header_analyzer.py suspicious.eml
+python3 06-encoding-utils/xor_file.py input.bin output.bin "de ad be ef"
 ```
 
 For scripts that send packets or bind raw sockets, run with appropriate
 privileges:
 
 ```bash
-sudo python3 arp_scan.py
-sudo python3 synScan_threaded.py
+sudo python3 03-network-scanning/synScan_threaded.py
+sudo python3 04-spoofing-lab/arp_spoof.py
+sudo python3 02-web-assessment/http_request_smuggling_probe.py 127.0.0.1:8080
 ```
 
 ## Development
 
-Validate syntax for all scripts with:
+Validate syntax across all categories with:
 
 ```bash
-python3 -m compileall -q *.py
+python3 -m compileall -q .
 ```
 
 The repository ignores Python cache files via `.gitignore`. Keep generated files,
